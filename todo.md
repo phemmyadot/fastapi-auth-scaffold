@@ -73,10 +73,10 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 3: Schemas (Pydantic v2) [Spec §2]
 
-- [ ] **3.1** Create `app/schemas/auth.py` — RegisterRequest, LoginRequest, TokenResponse, RefreshRequest, PasswordResetRequest, PasswordResetConfirm
-- [ ] **3.2** Create `app/schemas/user.py` — UserResponse, UserUpdate
-- [ ] **3.3** Create `app/schemas/token.py` — token-related schemas
-- [ ] **3.4** Create `app/schemas/api_key.py` — ApiKeyCreate, ApiKeyResponse *(complex tier, ENABLE_API_KEY_AUTH)*
+- [x] **3.1** Create `app/schemas/auth.py` — RegisterRequest, LoginRequest, TokenResponse, RefreshRequest, PasswordResetRequest, PasswordResetConfirm
+- [x] **3.2** Create `app/schemas/user.py` — UserResponse, UserUpdate
+- [x] **3.3** Create `app/schemas/token.py` — token-related schemas
+- [x] **3.4** Create `app/schemas/api_key.py` — ApiKeyCreate, ApiKeyResponse *(complex tier, ENABLE_API_KEY_AUTH)*
 
 ## Phase 4: Core Security & Utilities [Spec §3, §8]
 
