@@ -104,3 +104,39 @@ if settings.ENABLE_API_KEY_AUTH:
     ):
         service = ApiKeyService(db)
         await service.revoke(user_id=current_user.id, key_id=key_id)
+
+
+# --- Connected OAuth Accounts (Complex tier, ENABLE_OAUTH2) ---
+
+if settings.ENABLE_OAUTH2:
+    from app.schemas.oauth import OAuthAccountResponse
+    from app.services.oauth_service import OAuthService
+
+    @router.get(
+        "/me/connected-accounts",
+        response_model=list[OAuthAccountResponse],
+        summary="List connected OAuth accounts",
+        description="Returns all OAuth providers linked to the current user's account.",
+        tags=["oauth"],
+    )
+    async def list_connected_accounts(
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = OAuthService(db)
+        return await service.list_connected_accounts(user_id=current_user.id)
+
+    @router.delete(
+        "/me/connected-accounts/{provider}",
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary="Unlink OAuth provider",
+        description="Removes a linked OAuth provider. Cannot remove last login method (must have password or another provider).",
+        tags=["oauth"],
+    )
+    async def unlink_connected_account(
+        provider: str,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = OAuthService(db)
+        await service.unlink_account(user_id=current_user.id, provider=provider)

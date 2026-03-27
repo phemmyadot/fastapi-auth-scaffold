@@ -291,3 +291,49 @@ if settings.ENABLE_TOTP_2FA:
             user_agent=request.headers.get("user-agent", ""),
             ip_address=request.client.host if request.client else "",
         )
+
+
+# --- OAuth2 (Complex tier, ENABLE_OAUTH2) ---
+
+if settings.ENABLE_OAUTH2:
+    from fastapi.responses import RedirectResponse
+    from app.core.oauth2 import get_google_auth_url, get_github_auth_url
+    from app.services.oauth_service import OAuthService
+
+    @router.get(
+        "/oauth/{provider}",
+        summary="Initiate OAuth2 flow",
+        description="Redirects to the provider's OAuth consent screen with PKCE state.",
+        tags=["oauth"],
+    )
+    async def oauth_redirect(provider: str):
+        if provider == "google":
+            url, _state = get_google_auth_url()
+        elif provider == "github":
+            url, _state = get_github_auth_url()
+        else:
+            from app.core.exceptions import ValidationError
+            raise ValidationError(f"Unsupported OAuth provider: {provider}")
+        return RedirectResponse(url=url)
+
+    @router.get(
+        "/oauth/{provider}/callback",
+        summary="OAuth2 callback",
+        description="Handles OAuth callback, exchanges code for user info, creates or links user account, and returns tokens.",
+        tags=["oauth"],
+    )
+    async def oauth_callback(
+        provider: str,
+        code: str,
+        state: str,
+        request: Request,
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = OAuthService(db)
+        return await service.handle_callback(
+            provider=provider,
+            code=code,
+            state=state,
+            user_agent=request.headers.get("user-agent", ""),
+            ip_address=request.client.host if request.client else "",
+        )
