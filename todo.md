@@ -140,12 +140,12 @@ EMAIL_FROM=no-reply@yourdomain.com
 ## Phase 8: COMPLEX Tier Features (skip if AUTH_TIER=basic or standard) [Spec §4 Complex, §5, §7]
 
 ### API Key Auth (if ENABLE_API_KEY_AUTH=true) [Spec §4 Complex, §7 API Keys]
-- [ ] **8.1** Wire `ApiKey` model from Phase 2.5 into routes [Spec §6 ApiKey]
-- [ ] **8.2** `POST /users/me/api-keys` — generates new API key, return raw key ONCE on creation, store only SHA-256 hash [Spec §7, §8]
-- [ ] **8.3** `GET /users/me/api-keys` — list keys (prefix + metadata only, never raw key) [Spec §7]
-- [ ] **8.4** `DELETE /users/me/api-keys/{key_id}` — revoke key [Spec §7]
-- [ ] **8.5** Update `get_current_user` dependency: detect `Authorization: ApiKey <key>` header, lookup by hash, validate scopes, update `last_used_at` [Spec §4 Complex]
-- [ ] **8.6** `require_scope("read:profile")` dependency for protected routes [Spec §4 Complex]
+- [x] **8.1** Wire `ApiKey` model from Phase 2.5 into routes [Spec §6 ApiKey]
+- [x] **8.2** `POST /users/me/api-keys` — generates new API key, return raw key ONCE on creation, store only SHA-256 hash [Spec §7, §8]
+- [x] **8.3** `GET /users/me/api-keys` — list keys (prefix + metadata only, never raw key) [Spec §7]
+- [x] **8.4** `DELETE /users/me/api-keys/{key_id}` — revoke key [Spec §7]
+- [x] **8.5** Update `get_current_user` dependency: detect `Authorization: ApiKey <key>` header, lookup by hash, validate scopes, update `last_used_at` [Spec §4 Complex]
+- [x] **8.6** `require_scope("read:profile")` dependency for protected routes [Spec §4 Complex]
 
 ### RBAC (if ENABLE_RBAC=true) [Spec §4 Complex, §7 Admin]
 - [ ] **8.7** Wire `Role`/`UserRole` models from Phase 2.6 into routes [Spec §6 Role/UserRole]
