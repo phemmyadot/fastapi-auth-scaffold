@@ -11,6 +11,7 @@ from app.schemas.auth import (
     PasswordResetRequest,
     RefreshRequest,
     RegisterRequest,
+    TOTPChallengeResponse,
     TokenResponse,
 )
 from app.core.config import settings
@@ -46,7 +47,7 @@ async def register(
     "/login",
     response_model=TokenResponse,
     summary="Authenticate user",
-    description="Returns access + refresh tokens. Locks account after 5 failed attempts in 10 minutes.",
+    description="Returns access + refresh tokens. If TOTP is enabled, returns a session token for the two-step flow. Locks account after 5 failed attempts in 10 minutes.",
 )
 @limiter.limit("10/minute")
 async def login(
@@ -55,12 +56,25 @@ async def login(
     db: AsyncSession = Depends(get_db),
 ):
     service = AuthService(db)
-    return await service.login(
+    result = await service.login(
         email=body.email,
         password=body.password,
         user_agent=request.headers.get("user-agent", ""),
         ip_address=request.client.host if request.client else "",
     )
+
+    # Two-step TOTP login flow (Spec §4 Standard)
+    if settings.ENABLE_TOTP_2FA:
+        from app.services.totp_service import TOTPService
+        user = await service.user_repo.get_by_email(body.email.lower().strip())
+        if user and getattr(user, "totp_enabled", False):
+            # Revoke the tokens we just issued — they shouldn't be usable without TOTP
+            await service.logout(refresh_token=result.refresh_token)
+            totp_service = TOTPService(db)
+            session_token = await totp_service.create_session_token(user.id)
+            return TOTPChallengeResponse(session_token=session_token).model_dump()
+
+    return result
 
 
 @router.post(
@@ -207,3 +221,73 @@ if settings.ENABLE_PHONE_VERIFICATION:
         service = PhoneVerificationService(db)
         await service.verify_otp(user_id=current_user.id, otp_code=body.otp_code)
         return {"detail": "Phone verified successfully"}
+
+
+# --- TOTP 2FA (Standard tier, ENABLE_TOTP_2FA) ---
+
+if settings.ENABLE_TOTP_2FA:
+    from app.schemas.auth import TOTPVerifyRequest
+    from app.schemas.totp import TOTPDisableRequest, TOTPEnableRequest, TOTPSetupResponse
+    from app.services.totp_service import TOTPService
+
+    @router.post(
+        "/totp/setup",
+        response_model=TOTPSetupResponse,
+        summary="Setup TOTP 2FA",
+        description="Generates a TOTP secret, returns QR code data URI and 8 single-use backup codes.",
+    )
+    async def totp_setup(
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = TOTPService(db)
+        return await service.setup(user_id=current_user.id, email=current_user.email)
+
+    @router.post(
+        "/totp/enable",
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary="Enable TOTP 2FA",
+        description="Verifies the first TOTP code from the authenticator app and activates 2FA.",
+    )
+    async def totp_enable(
+        body: TOTPEnableRequest,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = TOTPService(db)
+        await service.enable(user_id=current_user.id, totp_code=body.totp_code)
+
+    @router.post(
+        "/totp/disable",
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary="Disable TOTP 2FA",
+        description="Disables 2FA. Requires current password and a valid TOTP code.",
+    )
+    async def totp_disable(
+        body: TOTPDisableRequest,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = TOTPService(db)
+        await service.disable(
+            user_id=current_user.id, password=body.password, totp_code=body.totp_code
+        )
+
+    @router.post(
+        "/totp/verify",
+        response_model=TokenResponse,
+        summary="Verify TOTP code (two-step login)",
+        description="Exchange session_token + TOTP code for final access/refresh tokens.",
+    )
+    async def totp_verify(
+        request: Request,
+        body: TOTPVerifyRequest,
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = TOTPService(db)
+        return await service.verify_and_issue_tokens(
+            session_token=body.session_token,
+            totp_code=body.totp_code,
+            user_agent=request.headers.get("user-agent", ""),
+            ip_address=request.client.host if request.client else "",
+        )

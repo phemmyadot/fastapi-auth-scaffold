@@ -128,14 +128,14 @@ EMAIL_FROM=no-reply@yourdomain.com
 - [x] **7.10** Rate limit: max 3 OTP sends per hour per phone number [Spec §4 Standard]
 
 ### TOTP 2FA (if ENABLE_TOTP_2FA=true) [Spec §4 Standard, §7 TOTP 2FA]
-- [ ] **7.11** Create `app/core/totp.py` — TOTP helpers using pyotp, Google Authenticator compatible [Spec §3]
-- [ ] **7.12** Add `totp_secret` (encrypted at rest), `totp_enabled` (bool) to `User` model (flag-gated) [Spec §6 User, §8]
-- [ ] **7.13** `POST /auth/totp/setup` — generates secret, returns {secret, otpauth_url, qr_code_data_uri} + 8 backup codes [Spec §7]
-- [ ] **7.14** `POST /auth/totp/enable` — verifies first TOTP code, activates 2FA [Spec §7]
-- [ ] **7.15** `POST /auth/totp/disable` — requires current password + valid TOTP code [Spec §4 Standard, §7]
-- [ ] **7.16** `POST /auth/totp/verify` — exchange session_token + TOTP code for final tokens (used during login as second factor) [Spec §7]
-- [ ] **7.17** Two-step login flow: if `totp_enabled=true`, `/auth/login` returns `{requires_totp: true, session_token: "..."}`, client calls `/auth/totp/verify` with session_token + totp_code to get final tokens [Spec §4 Standard]
-- [ ] **7.18** Generate 8 single-use backup codes on TOTP setup, store hashed [Spec §4 Standard]
+- [x] **7.11** Create `app/core/totp.py` — TOTP helpers using pyotp, Google Authenticator compatible [Spec §3]
+- [x] **7.12** Add `totp_secret` (encrypted at rest), `totp_enabled` (bool) to `User` model (flag-gated) [Spec §6 User, §8]
+- [x] **7.13** `POST /auth/totp/setup` — generates secret, returns {secret, otpauth_url, qr_code_data_uri} + 8 backup codes [Spec §7]
+- [x] **7.14** `POST /auth/totp/enable` — verifies first TOTP code, activates 2FA [Spec §7]
+- [x] **7.15** `POST /auth/totp/disable` — requires current password + valid TOTP code [Spec §4 Standard, §7]
+- [x] **7.16** `POST /auth/totp/verify` — exchange session_token + TOTP code for final tokens (used during login as second factor) [Spec §7]
+- [x] **7.17** Two-step login flow: if `totp_enabled=true`, `/auth/login` returns `{requires_totp: true, session_token: "..."}`, client calls `/auth/totp/verify` with session_token + totp_code to get final tokens [Spec §4 Standard]
+- [x] **7.18** Generate 8 single-use backup codes on TOTP setup, store hashed [Spec §4 Standard]
 
 ## Phase 8: COMPLEX Tier Features (skip if AUTH_TIER=basic or standard) [Spec §4 Complex, §5, §7]
 
