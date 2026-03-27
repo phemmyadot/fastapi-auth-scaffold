@@ -57,19 +57,19 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 2: Database Layer [Spec §6]
 
-- [ ] **2.1** Create `app/db/base.py` — SQLAlchemy async engine + session factory
-- [ ] **2.2** Create `app/db/models/__init__.py` — model registry
-- [ ] **2.3** Create `app/db/models/user.py` — `User` model: id (UUID PK), email (unique), username (unique, nullable), hashed_password (nullable — null for OAuth-only accounts), is_active, is_verified, created_at, updated_at. Flag-gated columns: email_verified_at, phone_number, phone_verified_at, totp_secret (encrypted), totp_enabled [Spec §6 User]
-- [ ] **2.4** Create `app/db/models/token.py` — `RefreshToken` model: id (UUID PK), user_id (FK), token_hash (SHA-256), expires_at, revoked, created_at, user_agent, ip_address [Spec §6 RefreshToken]
-- [ ] **2.5** Create `app/db/models/api_key.py` — `ApiKey` model: id (UUID PK), user_id (FK), name, key_hash (SHA-256), prefix (first 8 chars plaintext), scopes (list[str] array), last_used_at (nullable), expires_at (nullable), revoked, created_at *(complex tier, ENABLE_API_KEY_AUTH)* [Spec §6 ApiKey]
-- [ ] **2.6** Create `app/db/models/role.py` — `Role` model: id, name (unique), description, permissions (JSONB list[str]); `UserRole` join table: user_id (FK), role_id (FK) — composite PK *(complex tier, ENABLE_RBAC)* [Spec §6 Role/UserRole]
-- [ ] **2.7** Create `app/db/models/oauth_account.py` — `OAuthAccount` model: id (UUID PK), user_id (FK), provider (enum: google, github), provider_user_id, access_token (encrypted), refresh_token (encrypted, nullable), token_expires_at, created_at *(complex tier, ENABLE_OAUTH2)* [Spec §6 OAuthAccount]
-- [ ] **2.8** Create `app/db/models/audit_log.py` — `AuditLog` model: id (UUID PK), user_id (FK, nullable), event_type (enum, 20+ values), ip_address, user_agent, metadata (JSONB), created_at *(complex tier, ENABLE_AUDIT_LOGGING)* [Spec §6 AuditLog]
-- [ ] **2.9** Create `app/db/repositories/__init__.py`
-- [ ] **2.10** Create `app/db/repositories/user_repo.py` — CRUD for User
-- [ ] **2.11** Create `app/db/repositories/token_repo.py` — CRUD for RefreshToken
-- [ ] **2.12** Create `migrations/env.py` — Alembic async migration environment
-- [ ] **2.13** Generate initial Alembic migration
+- [x] **2.1** Create `app/db/base.py` — SQLAlchemy async engine + session factory
+- [x] **2.2** Create `app/db/models/__init__.py` — model registry
+- [x] **2.3** Create `app/db/models/user.py` — `User` model: id (UUID PK), email (unique), username (unique, nullable), hashed_password (nullable — null for OAuth-only accounts), is_active, is_verified, created_at, updated_at. Flag-gated columns: email_verified_at, phone_number, phone_verified_at, totp_secret (encrypted), totp_enabled [Spec §6 User]
+- [x] **2.4** Create `app/db/models/token.py` — `RefreshToken` model: id (UUID PK), user_id (FK), token_hash (SHA-256), expires_at, revoked, created_at, user_agent, ip_address [Spec §6 RefreshToken]
+- [x] **2.5** Create `app/db/models/api_key.py` — `ApiKey` model: id (UUID PK), user_id (FK), name, key_hash (SHA-256), prefix (first 8 chars plaintext), scopes (list[str] array), last_used_at (nullable), expires_at (nullable), revoked, created_at *(complex tier, ENABLE_API_KEY_AUTH)* [Spec §6 ApiKey]
+- [x] **2.6** Create `app/db/models/role.py` — `Role` model: id, name (unique), description, permissions (JSONB list[str]); `UserRole` join table: user_id (FK), role_id (FK) — composite PK *(complex tier, ENABLE_RBAC)* [Spec §6 Role/UserRole]
+- [x] **2.7** Create `app/db/models/oauth_account.py` — `OAuthAccount` model: id (UUID PK), user_id (FK), provider (enum: google, github), provider_user_id, access_token (encrypted), refresh_token (encrypted, nullable), token_expires_at, created_at *(complex tier, ENABLE_OAUTH2)* [Spec §6 OAuthAccount]
+- [x] **2.8** Create `app/db/models/audit_log.py` — `AuditLog` model: id (UUID PK), user_id (FK, nullable), event_type (enum, 20+ values), ip_address, user_agent, metadata (JSONB), created_at *(complex tier, ENABLE_AUDIT_LOGGING)* [Spec §6 AuditLog]
+- [x] **2.9** Create `app/db/repositories/__init__.py`
+- [x] **2.10** Create `app/db/repositories/user_repo.py` — CRUD for User
+- [x] **2.11** Create `app/db/repositories/token_repo.py` — CRUD for RefreshToken
+- [x] **2.12** Create `migrations/env.py` — Alembic async migration environment
+- [ ] **2.13** Generate initial Alembic migration *(deferred — requires running DB)*
 
 ## Phase 3: Schemas (Pydantic v2) [Spec §2]
 
