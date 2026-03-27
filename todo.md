@@ -114,11 +114,11 @@ EMAIL_FROM=no-reply@yourdomain.com
 ## Phase 7: STANDARD Tier Features (skip if AUTH_TIER=basic) [Spec §4 Standard, §5, §7]
 
 ### Email Verification (if ENABLE_EMAIL_VERIFICATION=true) [Spec §4 Standard, §7 Email Verification]
-- [ ] **7.1** Add `email_verified_at` (nullable datetime) to `User` model (flag-gated column) [Spec §6 User]
-- [ ] **7.2** `POST /auth/email/send-verification` — sends signed verification link (valid 24h) [Spec §7]
-- [ ] **7.3** `GET /auth/email/verify?token=...` — marks email verified [Spec §7]
-- [ ] **7.4** `require_verified_email` dependency — raises 403 if unverified, apply to sensitive routes [Spec §4 Standard]
-- [ ] **7.5** Resend throttle: max 3 resends per hour per user [Spec §4 Standard]
+- [x] **7.1** Add `email_verified_at` (nullable datetime) to `User` model (flag-gated column) [Spec §6 User]
+- [x] **7.2** `POST /auth/email/send-verification` — sends signed verification link (valid 24h) [Spec §7]
+- [x] **7.3** `GET /auth/email/verify?token=...` — marks email verified [Spec §7]
+- [x] **7.4** `require_verified_email` dependency — raises 403 if unverified, apply to sensitive routes [Spec §4 Standard]
+- [x] **7.5** Resend throttle: max 3 resends per hour per user [Spec §4 Standard]
 
 ### Phone Verification (if ENABLE_PHONE_VERIFICATION=true) [Spec §4 Standard, §7 Phone/SMS OTP]
 - [ ] **7.6** Create `app/core/sms.py` — Twilio SMS sending [Spec §3]

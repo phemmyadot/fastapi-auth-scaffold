@@ -13,6 +13,7 @@ from app.schemas.auth import (
     RegisterRequest,
     TokenResponse,
 )
+from app.core.config import settings
 from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
 
@@ -137,3 +138,36 @@ async def password_reset_confirm(
 ):
     service = AuthService(db)
     await service.confirm_password_reset(token=body.token, new_password=body.new_password)
+
+
+# --- Email Verification (Standard tier, ENABLE_EMAIL_VERIFICATION) ---
+
+if settings.ENABLE_EMAIL_VERIFICATION:
+    from app.services.email_verification_service import EmailVerificationService
+
+    @router.post(
+        "/email/send-verification",
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary="Send email verification link",
+        description="Sends a signed verification link valid for 24 hours. Max 3 resends per hour.",
+    )
+    async def send_email_verification(
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = EmailVerificationService(db)
+        await service.send_verification(user_id=current_user.id, email=current_user.email)
+
+    @router.get(
+        "/email/verify",
+        status_code=status.HTTP_200_OK,
+        summary="Verify email address",
+        description="Marks the user's email as verified using the token from the verification link.",
+    )
+    async def verify_email(
+        token: str,
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = EmailVerificationService(db)
+        await service.verify_email(token=token)
+        return {"detail": "Email verified successfully"}
