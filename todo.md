@@ -121,11 +121,11 @@ EMAIL_FROM=no-reply@yourdomain.com
 - [x] **7.5** Resend throttle: max 3 resends per hour per user [Spec §4 Standard]
 
 ### Phone Verification (if ENABLE_PHONE_VERIFICATION=true) [Spec §4 Standard, §7 Phone/SMS OTP]
-- [ ] **7.6** Create `app/core/sms.py` — Twilio SMS sending [Spec §3]
-- [ ] **7.7** Add `phone_number` (unique, nullable), `phone_verified_at` (nullable datetime) to `User` model (flag-gated) [Spec §6 User]
-- [ ] **7.8** `POST /auth/phone/send-otp` — sends 6-digit OTP via Twilio, store hashed OTP + expiry (10 min) [Spec §7]
-- [ ] **7.9** `POST /auth/phone/verify-otp` — validates OTP, marks phone verified, OTP single-use [Spec §7]
-- [ ] **7.10** Rate limit: max 3 OTP sends per hour per phone number [Spec §4 Standard]
+- [x] **7.6** Create `app/core/sms.py` — Twilio SMS sending [Spec §3]
+- [x] **7.7** Add `phone_number` (unique, nullable), `phone_verified_at` (nullable datetime) to `User` model (flag-gated) [Spec §6 User]
+- [x] **7.8** `POST /auth/phone/send-otp` — sends 6-digit OTP via Twilio, store hashed OTP + expiry (10 min) [Spec §7]
+- [x] **7.9** `POST /auth/phone/verify-otp` — validates OTP, marks phone verified, OTP single-use [Spec §7]
+- [x] **7.10** Rate limit: max 3 OTP sends per hour per phone number [Spec §4 Standard]
 
 ### TOTP 2FA (if ENABLE_TOTP_2FA=true) [Spec §4 Standard, §7 TOTP 2FA]
 - [ ] **7.11** Create `app/core/totp.py` — TOTP helpers using pyotp, Google Authenticator compatible [Spec §3]

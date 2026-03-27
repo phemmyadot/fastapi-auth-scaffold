@@ -171,3 +171,39 @@ if settings.ENABLE_EMAIL_VERIFICATION:
         service = EmailVerificationService(db)
         await service.verify_email(token=token)
         return {"detail": "Email verified successfully"}
+
+
+# --- Phone Verification (Standard tier, ENABLE_PHONE_VERIFICATION) ---
+
+if settings.ENABLE_PHONE_VERIFICATION:
+    from app.schemas.phone import SendOTPRequest, VerifyOTPRequest
+    from app.services.phone_verification_service import PhoneVerificationService
+
+    @router.post(
+        "/phone/send-otp",
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary="Send phone OTP",
+        description="Sends a 6-digit OTP via Twilio SMS. 10-minute expiry. Max 3 sends per hour per number.",
+    )
+    async def send_phone_otp(
+        body: SendOTPRequest,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = PhoneVerificationService(db)
+        await service.send_otp(user_id=current_user.id, phone_number=body.phone_number)
+
+    @router.post(
+        "/phone/verify-otp",
+        status_code=status.HTTP_200_OK,
+        summary="Verify phone OTP",
+        description="Validates the OTP code and marks phone as verified. OTP is single-use.",
+    )
+    async def verify_phone_otp(
+        body: VerifyOTPRequest,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        service = PhoneVerificationService(db)
+        await service.verify_otp(user_id=current_user.id, otp_code=body.otp_code)
+        return {"detail": "Phone verified successfully"}
