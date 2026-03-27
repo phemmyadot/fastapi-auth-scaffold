@@ -92,9 +92,9 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 6: API Routes — BASIC Tier [Spec §4 Basic, §7 Core Auth, §8]
 
-- [ ] **6.1** Create `app/api/v1/auth/dependencies.py` — `get_current_user`, `require_role`, `require_scope` [Spec §2]
-- [ ] **6.2** Create `app/api/v1/auth/__init__.py`
-- [ ] **6.3** Create `app/api/v1/auth/router.py` — all basic auth endpoints [Spec §7 Core Auth]:
+- [x] **6.1** Create `app/api/v1/auth/dependencies.py` — `get_current_user`, `require_role`, `require_scope` [Spec §2]
+- [x] **6.2** Create `app/api/v1/auth/__init__.py`
+- [x] **6.3** Create `app/api/v1/auth/router.py` — all basic auth endpoints [Spec §7 Core Auth]:
   - `POST /auth/register` — email + password (or username + password), returns 201 with user
   - `POST /auth/login` — returns {access_token, refresh_token, token_type}, lockout after 5 failures/10 min
   - `POST /auth/refresh` — validate refresh token hash, rotate tokens (old invalidated)
@@ -102,14 +102,14 @@ EMAIL_FROM=no-reply@yourdomain.com
   - `POST /auth/logout-all` — revoke all refresh tokens for user
   - `POST /auth/password-reset/request` — send reset link via email (1hr token, single-use)
   - `POST /auth/password-reset/confirm` — validate token, update password, invalidate all refresh tokens
-- [ ] **6.4** Create `app/api/v1/users/__init__.py`
-- [ ] **6.5** Create `app/api/v1/users/router.py` — `GET /users/me`, `PATCH /users/me` [Spec §7 Core Auth]
-- [ ] **6.6** Create `app/api/__init__.py`
-- [ ] **6.7** Create `app/api/router.py` — aggregate all v1 routers
-- [ ] **6.8** Create `app/main.py` — FastAPI app factory, CORS (from CORS_ORIGINS), security headers middleware (X-Frame-Options: DENY, X-Content-Type-Options: nosniff, HSTS), global exception handler (RFC 7807 Problem JSON: {type, title, status, detail, instance}), rate limiting, router inclusion [Spec §8]
-- [ ] **6.9** Rate limits: 10 req/min on `/auth/login`, 5 req/min on `/auth/register`, 3 req/min on `/auth/password-reset/request` [Spec §4 Basic]
-- [ ] **6.10** HTTP-only cookie option for refresh token (configurable) [Spec §4 Basic]
-- [ ] **6.11** Identical error message for "user not found" vs "wrong password" on login (prevent user enumeration) [Spec §8]
+- [x] **6.4** Create `app/api/v1/users/__init__.py`
+- [x] **6.5** Create `app/api/v1/users/router.py` — `GET /users/me`, `PATCH /users/me` [Spec §7 Core Auth]
+- [x] **6.6** Create `app/api/__init__.py`
+- [x] **6.7** Create `app/api/router.py` — aggregate all v1 routers
+- [x] **6.8** Create `app/main.py` — FastAPI app factory, CORS (from CORS_ORIGINS), security headers middleware (X-Frame-Options: DENY, X-Content-Type-Options: nosniff, HSTS), global exception handler (RFC 7807 Problem JSON: {type, title, status, detail, instance}), rate limiting, router inclusion [Spec §8]
+- [x] **6.9** Rate limits: 10 req/min on `/auth/login`, 5 req/min on `/auth/register`, 3 req/min on `/auth/password-reset/request` [Spec §4 Basic]
+- [x] **6.10** HTTP-only cookie option for refresh token (configurable) [Spec §4 Basic]
+- [x] **6.11** Identical error message for "user not found" vs "wrong password" on login (prevent user enumeration) [Spec §8]
 
 ## Phase 7: STANDARD Tier Features (skip if AUTH_TIER=basic) [Spec §4 Standard, §5, §7]
 
