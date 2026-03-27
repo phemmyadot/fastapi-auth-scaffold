@@ -80,10 +80,10 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 4: Core Security & Utilities [Spec §3, §8]
 
-- [ ] **4.1** Create `app/core/security.py` — password hashing (bcrypt 12 rounds), JWT creation/verification (HS256), token comparison with `hmac.compare_digest` (constant-time) [Spec §8]
-- [ ] **4.2** Create `app/core/email.py` — async email sending via aiosmtplib + jinja2 HTML templates [Spec §3]
-- [ ] **4.3** Create `app/core/rate_limit.py` — slowapi limiter configuration [Spec §3]
-- [ ] **4.4** Create custom exception classes: `AuthError`, `NotFoundError`, `PermissionError`, `ValidationError` — all return RFC 7807 Problem JSON [Spec §4 Basic, §8]
+- [x] **4.1** Create `app/core/security.py` — password hashing (bcrypt 12 rounds), JWT creation/verification (HS256), token comparison with `hmac.compare_digest` (constant-time) [Spec §8]
+- [x] **4.2** Create `app/core/email.py` — async email sending via aiosmtplib + jinja2 HTML templates [Spec §3]
+- [x] **4.3** Create `app/core/rate_limit.py` — slowapi limiter configuration [Spec §3]
+- [x] **4.4** Create custom exception classes: `AuthError`, `NotFoundError`, `PermissionError`, `ValidationError` — all return RFC 7807 Problem JSON [Spec §4 Basic, §8]
 
 ## Phase 5: Services (Business Logic) [Spec §2, §4]
 
