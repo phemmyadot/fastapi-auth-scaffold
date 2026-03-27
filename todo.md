@@ -87,8 +87,8 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 5: Services (Business Logic) [Spec §2, §4]
 
-- [ ] **5.1** Create `app/services/auth_service.py` — register, login (with account lockout after 5 failed attempts in 10-min window), refresh (token rotation), logout, logout-all, password-reset-request (1hr signed link, single-use), password-reset-confirm (invalidates all refresh tokens) [Spec §4 Basic]
-- [ ] **5.2** Create `app/services/user_service.py` — get profile, update profile (username/display name)
+- [x] **5.1** Create `app/services/auth_service.py` — register, login (with account lockout after 5 failed attempts in 10-min window), refresh (token rotation), logout, logout-all, password-reset-request (1hr signed link, single-use), password-reset-confirm (invalidates all refresh tokens) [Spec §4 Basic]
+- [x] **5.2** Create `app/services/user_service.py` — get profile, update profile (username/display name)
 
 ## Phase 6: API Routes — BASIC Tier [Spec §4 Basic, §7 Core Auth, §8]
 
