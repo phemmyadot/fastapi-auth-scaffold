@@ -177,15 +177,15 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 9: Testing [Spec §10]
 
-- [ ] **9.1** Create `tests/conftest.py` — async test client (pytest-asyncio + httpx.AsyncClient), test DB lifecycle, user fixtures for each tier [Spec §10]
-- [ ] **9.2** Create `tests/test_auth_basic.py` — register, login, refresh, logout, logout-all, password reset, account lockout [Spec §10]
-- [ ] **9.3** Create `tests/test_email_verification.py` *(if ENABLE_EMAIL_VERIFICATION)* — send link, verify, expired link, resend throttle, route guard (require_verified_email) [Spec §10]
-- [ ] **9.4** Create `tests/test_phone_otp.py` *(if ENABLE_PHONE_VERIFICATION)* — send OTP, verify OTP, expired OTP, reuse rejection, rate limit [Spec §10]
-- [ ] **9.5** Create `tests/test_totp.py` *(if ENABLE_TOTP_2FA)* — setup, enable, two-step login, backup code use, disable [Spec §10]
-- [ ] **9.6** Create `tests/test_api_keys.py` *(if ENABLE_API_KEY_AUTH)* — create, list, authenticate via ApiKey header, scope rejection, revoke [Spec §10]
-- [ ] **9.7** Create `tests/test_rbac.py` *(if ENABLE_RBAC)* — role assignment, permission enforcement, admin routes, ban/unban [Spec §10]
-- [ ] **9.8** Create `tests/test_audit.py` *(if ENABLE_AUDIT_LOGGING)* — verify correct event type logged after each auth action [Spec §10]
-- [ ] **9.9** Mock Twilio and SMTP in tests using `unittest.mock.patch` [Spec §10]
+- [x] **9.1** Create `tests/conftest.py` — async test client (pytest-asyncio + httpx.AsyncClient), test DB lifecycle, user fixtures for each tier [Spec §10]
+- [x] **9.2** Create `tests/test_auth_basic.py` — register, login, refresh, logout, logout-all, password reset, account lockout [Spec §10]
+- [x] **9.3** Create `tests/test_email_verification.py` *(if ENABLE_EMAIL_VERIFICATION)* — send link, verify, expired link, resend throttle, route guard (require_verified_email) [Spec §10]
+- [x] **9.4** Create `tests/test_phone_otp.py` *(if ENABLE_PHONE_VERIFICATION)* — send OTP, verify OTP, expired OTP, reuse rejection, rate limit [Spec §10]
+- [x] **9.5** Create `tests/test_totp.py` *(if ENABLE_TOTP_2FA)* — setup, enable, two-step login, backup code use, disable [Spec §10]
+- [x] **9.6** Create `tests/test_api_keys.py` *(if ENABLE_API_KEY_AUTH)* — create, list, authenticate via ApiKey header, scope rejection, revoke [Spec §10]
+- [x] **9.7** Create `tests/test_rbac.py` *(if ENABLE_RBAC)* — role assignment, permission enforcement, admin routes, ban/unban [Spec §10]
+- [x] **9.8** Create `tests/test_audit.py` *(if ENABLE_AUDIT_LOGGING)* — verify correct event type logged after each auth action [Spec §10]
+- [x] **9.9** Mock Twilio and SMTP in tests using `unittest.mock.patch` [Spec §10]
 
 ## Phase 10: Documentation & Final Wiring [Spec §8, §12]
 
