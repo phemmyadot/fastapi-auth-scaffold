@@ -49,11 +49,11 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 1: Project Setup & Configuration [Spec §2, §3, §9, §11]
 
-- [ ] **1.1** Create `requirements.txt` — always: fastapi, uvicorn, sqlalchemy[asyncio], asyncpg, alembic, pydantic, passlib[bcrypt], python-jose[cryptography], python-multipart, slowapi, aiosmtplib, jinja2; conditional: twilio (phone), pyotp (totp), httpx (oauth2), structlog (audit); dev: pytest-asyncio, httpx [Spec §3]
-- [ ] **1.2** Create `.env.example` with all configuration variables, no real secrets [Spec §9]
-- [ ] **1.3** Create `alembic.ini` configured for async PostgreSQL
-- [ ] **1.4** Create `Makefile` with targets: dev, migrate, revision, test, lint, seed [Spec §11]
-- [ ] **1.5** Create `app/core/config.py` — Pydantic Settings class reading from `.env`; include AUTH_TIER, all feature flags, CORS_ORIGINS; enforce min-tier requirements per flag (e.g. ENABLE_RBAC requires complex) [Spec §5, §9]
+- [x] **1.1** Create `requirements.txt` — always: fastapi, uvicorn, sqlalchemy[asyncio], asyncpg, alembic, pydantic, passlib[bcrypt], python-jose[cryptography], python-multipart, slowapi, aiosmtplib, jinja2; conditional: twilio (phone), pyotp (totp), httpx (oauth2), structlog (audit); dev: pytest-asyncio, httpx [Spec §3]
+- [x] **1.2** Create `.env.example` with all configuration variables, no real secrets [Spec §9]
+- [x] **1.3** Create `alembic.ini` configured for async PostgreSQL
+- [x] **1.4** Create `Makefile` with targets: dev, migrate, revision, test, lint, seed [Spec §11]
+- [x] **1.5** Create `app/core/config.py` — Pydantic Settings class reading from `.env`; include AUTH_TIER, all feature flags, CORS_ORIGINS; enforce min-tier requirements per flag (e.g. ENABLE_RBAC requires complex) [Spec §5, §9]
 
 ## Phase 2: Database Layer [Spec §6]
 
