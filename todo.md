@@ -169,11 +169,11 @@ EMAIL_FROM=no-reply@yourdomain.com
 - [x] **8.23** `DELETE /users/me/connected-accounts/{provider}` — unlink guard: cannot remove last login method (must have password set or another provider linked) [Spec §4 Complex]
 
 ### Audit Logging (if ENABLE_AUDIT_LOGGING=true) [Spec §4 Complex, §7 Admin]
-- [ ] **8.24** Create `app/core/audit.py` — non-blocking fire-and-forget audit log writer using `asyncio.create_task` + structlog [Spec §3, §4 Complex]
-- [ ] **8.25** Wire `AuditLog` model from Phase 2.8 into routes [Spec §6 AuditLog]
-- [ ] **8.26** Event types (20+): register, login_success, login_failed, logout, logout_all, password_reset_request, password_reset_confirm, email_verification_sent, email_verified, phone_otp_sent, phone_verified, totp_enabled, totp_disabled, totp_failed, api_key_created, api_key_revoked, oauth_login, role_assigned, role_removed, user_banned, token_refreshed [Spec §4 Complex]
-- [ ] **8.27** Instrument all auth endpoints with audit logging calls
-- [ ] **8.28** `GET /admin/audit-logs` — paginated, filterable by user_id, event_type, date range (admin only) [Spec §7 Admin]
+- [x] **8.24** Create `app/core/audit.py` — non-blocking fire-and-forget audit log writer using `asyncio.create_task` + structlog [Spec §3, §4 Complex]
+- [x] **8.25** Wire `AuditLog` model from Phase 2.8 into routes [Spec §6 AuditLog]
+- [x] **8.26** Event types (20+): register, login_success, login_failed, logout, logout_all, password_reset_request, password_reset_confirm, email_verification_sent, email_verified, phone_otp_sent, phone_verified, totp_enabled, totp_disabled, totp_failed, api_key_created, api_key_revoked, oauth_login, role_assigned, role_removed, user_banned, token_refreshed [Spec §4 Complex]
+- [x] **8.27** Instrument all auth endpoints with audit logging calls
+- [x] **8.28** `GET /admin/audit-logs` — paginated, filterable by user_id, event_type, date range (admin only) [Spec §7 Admin]
 
 ## Phase 9: Testing [Spec §10]
 

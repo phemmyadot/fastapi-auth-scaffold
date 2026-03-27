@@ -1,11 +1,16 @@
 import uuid
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.dependencies import require_role
+from app.core.audit import emit_audit_log
 from app.db.base import get_db
+from app.db.models.audit_log import AuditEventType, AuditLog
 from app.db.models.user import User
+from app.schemas.audit import AuditLogResponse
 from app.schemas.user import UserResponse
 from app.services.admin_service import AdminService
 
@@ -42,6 +47,11 @@ async def assign_role(
 ):
     service = AdminService(db)
     await service.assign_role(user_id=user_id, role_id=role_id)
+    emit_audit_log(
+        AuditEventType.ROLE_ASSIGNED,
+        user_id=user_id,
+        metadata={"role_id": str(role_id), "assigned_by": str(_current_user.id)},
+    )
 
 
 @router.delete(
@@ -58,6 +68,11 @@ async def remove_role(
 ):
     service = AdminService(db)
     await service.remove_role(user_id=user_id, role_id=role_id)
+    emit_audit_log(
+        AuditEventType.ROLE_REMOVED,
+        user_id=user_id,
+        metadata={"role_id": str(role_id), "removed_by": str(_current_user.id)},
+    )
 
 
 @router.post(
@@ -73,6 +88,11 @@ async def ban_user(
 ):
     service = AdminService(db)
     await service.ban_user(user_id=user_id)
+    emit_audit_log(
+        AuditEventType.USER_BANNED,
+        user_id=user_id,
+        metadata={"banned_by": str(_current_user.id)},
+    )
 
 
 @router.post(
@@ -88,3 +108,33 @@ async def unban_user(
 ):
     service = AdminService(db)
     await service.unban_user(user_id=user_id)
+
+
+@router.get(
+    "/audit-logs",
+    response_model=list[AuditLogResponse],
+    summary="List audit logs",
+    description="Returns paginated audit logs. Filterable by user_id, event_type, and date range. Admin only.",
+)
+async def list_audit_logs(
+    user_id: uuid.UUID | None = Query(default=None),
+    event_type: AuditEventType | None = Query(default=None),
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=50, ge=1, le=100),
+    _current_user: User = Depends(require_role("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    query = select(AuditLog)
+    if user_id:
+        query = query.where(AuditLog.user_id == user_id)
+    if event_type:
+        query = query.where(AuditLog.event_type == event_type)
+    if start_date:
+        query = query.where(AuditLog.created_at >= start_date)
+    if end_date:
+        query = query.where(AuditLog.created_at <= end_date)
+    query = query.order_by(AuditLog.created_at.desc()).offset(offset).limit(limit)
+    result = await db.execute(query)
+    return list(result.scalars().all())

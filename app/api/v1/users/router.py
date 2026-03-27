@@ -4,8 +4,10 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.dependencies import get_current_user
+from app.core.audit import emit_audit_log
 from app.core.config import settings
 from app.db.base import get_db
+from app.db.models.audit_log import AuditEventType
 from app.db.models.user import User
 from app.schemas.user import UserResponse, UserUpdate
 from app.services.user_service import UserService
@@ -64,6 +66,11 @@ if settings.ENABLE_API_KEY_AUTH:
             scopes=body.scopes,
             expires_at=body.expires_at,
         )
+        emit_audit_log(
+            AuditEventType.API_KEY_CREATED,
+            user_id=current_user.id,
+            metadata={"key_name": body.name, "key_id": str(api_key.id)},
+        )
         return ApiKeyCreatedResponse(
             id=api_key.id,
             name=api_key.name,
@@ -104,6 +111,11 @@ if settings.ENABLE_API_KEY_AUTH:
     ):
         service = ApiKeyService(db)
         await service.revoke(user_id=current_user.id, key_id=key_id)
+        emit_audit_log(
+            AuditEventType.API_KEY_REVOKED,
+            user_id=current_user.id,
+            metadata={"key_id": str(key_id)},
+        )
 
 
 # --- Connected OAuth Accounts (Complex tier, ENABLE_OAUTH2) ---

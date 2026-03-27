@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.dependencies import get_current_user
+from app.core.audit import emit_audit_log
 from app.core.rate_limit import limiter
 from app.db.base import get_db
+from app.db.models.audit_log import AuditEventType
 from app.db.models.user import User
 from app.schemas.auth import (
     LoginRequest,
@@ -40,6 +42,12 @@ async def register(
         password=body.password,
         username=body.username,
     )
+    emit_audit_log(
+        AuditEventType.REGISTER,
+        user_id=user.id,
+        ip_address=request.client.host if request.client else "",
+        user_agent=request.headers.get("user-agent", ""),
+    )
     return user
 
 
@@ -56,17 +64,24 @@ async def login(
     db: AsyncSession = Depends(get_db),
 ):
     service = AuthService(db)
-    result = await service.login(
-        email=body.email,
-        password=body.password,
-        user_agent=request.headers.get("user-agent", ""),
-        ip_address=request.client.host if request.client else "",
-    )
+    ip = request.client.host if request.client else ""
+    ua = request.headers.get("user-agent", "")
+    try:
+        result = await service.login(
+            email=body.email,
+            password=body.password,
+            user_agent=ua,
+            ip_address=ip,
+        )
+    except Exception:
+        emit_audit_log(AuditEventType.LOGIN_FAILED, ip_address=ip, user_agent=ua, metadata={"email": body.email})
+        raise
+
+    user = await service.user_repo.get_by_email(body.email.lower().strip())
 
     # Two-step TOTP login flow (Spec §4 Standard)
     if settings.ENABLE_TOTP_2FA:
         from app.services.totp_service import TOTPService
-        user = await service.user_repo.get_by_email(body.email.lower().strip())
         if user and getattr(user, "totp_enabled", False):
             # Revoke the tokens we just issued — they shouldn't be usable without TOTP
             await service.logout(refresh_token=result.refresh_token)
@@ -74,6 +89,7 @@ async def login(
             session_token = await totp_service.create_session_token(user.id)
             return TOTPChallengeResponse(session_token=session_token).model_dump()
 
+    emit_audit_log(AuditEventType.LOGIN_SUCCESS, user_id=user.id if user else None, ip_address=ip, user_agent=ua)
     return result
 
 
@@ -89,11 +105,17 @@ async def refresh(
     db: AsyncSession = Depends(get_db),
 ):
     service = AuthService(db)
-    return await service.refresh(
+    result = await service.refresh(
         refresh_token=body.refresh_token,
         user_agent=request.headers.get("user-agent", ""),
         ip_address=request.client.host if request.client else "",
     )
+    emit_audit_log(
+        AuditEventType.TOKEN_REFRESHED,
+        ip_address=request.client.host if request.client else "",
+        user_agent=request.headers.get("user-agent", ""),
+    )
+    return result
 
 
 @router.post(
@@ -108,6 +130,7 @@ async def logout(
 ):
     service = AuthService(db)
     await service.logout(refresh_token=body.refresh_token)
+    emit_audit_log(AuditEventType.LOGOUT)
 
 
 @router.post(
@@ -122,6 +145,7 @@ async def logout_all(
 ):
     service = AuthService(db)
     await service.logout_all(user_id=current_user.id)
+    emit_audit_log(AuditEventType.LOGOUT_ALL, user_id=current_user.id)
 
 
 @router.post(
@@ -138,6 +162,11 @@ async def password_reset_request(
 ):
     service = AuthService(db)
     await service.request_password_reset(email=body.email)
+    emit_audit_log(
+        AuditEventType.PASSWORD_RESET_REQUEST,
+        ip_address=request.client.host if request.client else "",
+        user_agent=request.headers.get("user-agent", ""),
+    )
 
 
 @router.post(
@@ -152,6 +181,7 @@ async def password_reset_confirm(
 ):
     service = AuthService(db)
     await service.confirm_password_reset(token=body.token, new_password=body.new_password)
+    emit_audit_log(AuditEventType.PASSWORD_RESET_CONFIRM)
 
 
 # --- Email Verification (Standard tier, ENABLE_EMAIL_VERIFICATION) ---
@@ -171,6 +201,7 @@ if settings.ENABLE_EMAIL_VERIFICATION:
     ):
         service = EmailVerificationService(db)
         await service.send_verification(user_id=current_user.id, email=current_user.email)
+        emit_audit_log(AuditEventType.EMAIL_VERIFICATION_SENT, user_id=current_user.id)
 
     @router.get(
         "/email/verify",
@@ -184,6 +215,7 @@ if settings.ENABLE_EMAIL_VERIFICATION:
     ):
         service = EmailVerificationService(db)
         await service.verify_email(token=token)
+        emit_audit_log(AuditEventType.EMAIL_VERIFIED)
         return {"detail": "Email verified successfully"}
 
 
@@ -206,6 +238,7 @@ if settings.ENABLE_PHONE_VERIFICATION:
     ):
         service = PhoneVerificationService(db)
         await service.send_otp(user_id=current_user.id, phone_number=body.phone_number)
+        emit_audit_log(AuditEventType.PHONE_OTP_SENT, user_id=current_user.id)
 
     @router.post(
         "/phone/verify-otp",
@@ -220,6 +253,7 @@ if settings.ENABLE_PHONE_VERIFICATION:
     ):
         service = PhoneVerificationService(db)
         await service.verify_otp(user_id=current_user.id, otp_code=body.otp_code)
+        emit_audit_log(AuditEventType.PHONE_VERIFIED, user_id=current_user.id)
         return {"detail": "Phone verified successfully"}
 
 
@@ -256,6 +290,7 @@ if settings.ENABLE_TOTP_2FA:
     ):
         service = TOTPService(db)
         await service.enable(user_id=current_user.id, totp_code=body.totp_code)
+        emit_audit_log(AuditEventType.TOTP_ENABLED, user_id=current_user.id)
 
     @router.post(
         "/totp/disable",
@@ -272,6 +307,7 @@ if settings.ENABLE_TOTP_2FA:
         await service.disable(
             user_id=current_user.id, password=body.password, totp_code=body.totp_code
         )
+        emit_audit_log(AuditEventType.TOTP_DISABLED, user_id=current_user.id)
 
     @router.post(
         "/totp/verify",
@@ -330,10 +366,17 @@ if settings.ENABLE_OAUTH2:
         db: AsyncSession = Depends(get_db),
     ):
         service = OAuthService(db)
-        return await service.handle_callback(
+        result = await service.handle_callback(
             provider=provider,
             code=code,
             state=state,
             user_agent=request.headers.get("user-agent", ""),
             ip_address=request.client.host if request.client else "",
         )
+        emit_audit_log(
+            AuditEventType.OAUTH_LOGIN,
+            ip_address=request.client.host if request.client else "",
+            user_agent=request.headers.get("user-agent", ""),
+            metadata={"provider": provider},
+        )
+        return result
