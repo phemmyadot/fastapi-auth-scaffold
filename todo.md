@@ -189,17 +189,17 @@ EMAIL_FROM=no-reply@yourdomain.com
 
 ## Phase 10: Documentation & Final Wiring [Spec §8, §12]
 
-- [ ] **10.1** Add `tags`, `summary`, and `description` to every router endpoint
-- [ ] **10.2** Create `docs/AUTH_FLOWS.md` — login flows for each tier with ASCII sequence diagrams
-- [ ] **10.3** Security hardening review against Spec §8 checklist:
-  - All token comparisons use `hmac.compare_digest` (constant-time)
-  - Passwords never logged, never returned in any response body
-  - Identical error for "user not found" vs "wrong password" (no user enumeration)
-  - Refresh tokens stored as SHA-256 hash only; raw never persisted
-  - UUIDs for all primary keys (no sequential integers)
-  - All queries use SQLAlchemy ORM parameterized statements (no string interpolation)
-  - Security headers: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, HSTS
-  - totp_secret and OAuth tokens stored encrypted at rest
-  - Emails lowercased and stripped on all input paths
-  - Global exception handler strips internal detail; RFC 7807 only
-  - `.env.example` contains all variables, no real secrets
+- [x] **10.1** Add `tags`, `summary`, and `description` to every router endpoint
+- [x] **10.2** Create `docs/AUTH_FLOWS.md` — login flows for each tier with ASCII sequence diagrams
+- [x] **10.3** Security hardening review against Spec §8 checklist:
+  - All token comparisons use `hmac.compare_digest` (constant-time) ✓
+  - Passwords never logged, never returned in any response body ✓
+  - Identical error for "user not found" vs "wrong password" (no user enumeration) ✓
+  - Refresh tokens stored as SHA-256 hash only; raw never persisted ✓
+  - UUIDs for all primary keys (no sequential integers) ✓
+  - All queries use SQLAlchemy ORM parameterized statements (no string interpolation) ✓
+  - Security headers: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, HSTS ✓
+  - totp_secret and OAuth tokens stored encrypted at rest ✓
+  - Emails lowercased and stripped on all input paths ✓
+  - Global exception handler strips internal detail; RFC 7807 only ✓
+  - `.env.example` contains all variables, no real secrets ✓
